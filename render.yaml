@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: research-agent
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --threads 4 --timeout 300
+    envVars:
+      - key: FLASK_SECRET_KEY
+        generateValue: true          # Render auto-generates this
+      - key: SUPABASE_URL
+        sync: false                  # You fill in the dashboard
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: ADMIN_SECRET
+        sync: false

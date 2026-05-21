@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — ResearchAgent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #07070e;
+      --surface: #0e0e1a;
+      --border: #1a1a2e;
+      --accent: #7c6af7;
+      --accent2: #e05cff;
+      --green: #3dfabc;
+      --yellow: #f7c948;
+      --red: #ff5c5c;
+      --text: #e8e8f0;
+      --muted: #55556a;
+      --card: #10101e;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 100; opacity: 0.3;
+    }
+
+    header {
+      padding: 1.1rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7,7,14,0.9); backdrop-filter: blur(12px);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .logo {
+      font-size: 1rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .admin-badge {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      background: rgba(247, 201, 72, 0.12); color: var(--yellow);
+      border: 1px solid rgba(247,201,72,0.3); border-radius: 20px;
+      padding: 0.3rem 0.8rem; letter-spacing: 0.1em;
+    }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 2rem; }
+
+    /* Stats row */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.4rem 1.5rem;
+      animation: fadein 0.4s ease both;
+    }
+    .stat-card:nth-child(2) { animation-delay: 0.05s; }
+    .stat-card:nth-child(3) { animation-delay: 0.1s; }
+    .stat-card:nth-child(4) { animation-delay: 0.15s; }
+    @keyframes fadein { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+    .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+    .stat-value.purple { background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-value.green { color: var(--green); }
+    .stat-value.yellow { color: var(--yellow); }
+    .stat-value.blue { color: #5bc8ff; }
+
+    /* Controls */
+    .controls {
+      display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap;
+    }
+    .search-input {
+      flex: 1; min-width: 200px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.7rem 1rem;
+      color: var(--text); font-family: 'Syne', sans-serif; font-size: 0.88rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--muted); }
+
+    .filter-btn {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.7rem 1.1rem;
+      color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem;
+      cursor: pointer; letter-spacing: 0.08em; transition: all 0.2s;
+    }
+    .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(124,106,247,0.08); }
+    .filter-btn:hover:not(.active) { border-color: var(--border); color: var(--text); }
+
+    .section-title { font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text); }
+
+    /* User cards grid */
+    .users-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;
+    }
+
+    .user-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.25rem 1.4rem;
+      display: flex; align-items: center; gap: 1rem;
+      animation: fadein 0.35s ease both;
+      transition: border-color 0.2s;
+    }
+    .user-card:hover { border-color: var(--accent); }
+
+    .u-avatar {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 700; color: #fff;
+      overflow: hidden;
+    }
+    .u-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+    .u-info { flex: 1; min-width: 0; }
+    .u-name { font-size: 0.9rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .u-email { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 0.15rem; }
+    .u-meta { display: flex; gap: 0.5rem; margin-top: 0.5rem; align-items: center; }
+
+    .provider-badge {
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em;
+      padding: 0.2rem 0.55rem; border-radius: 20px;
+    }
+    .provider-google { background: rgba(66,133,244,0.12); color: #5bc8ff; border: 1px solid rgba(91,200,255,0.2); }
+    .provider-email { background: rgba(124,106,247,0.12); color: var(--accent); border: 1px solid rgba(124,106,247,0.2); }
+
+    .u-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+
+    .empty-state {
+      text-align: center; padding: 3rem; color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem;
+    }
+
+    .loading {
+      text-align: center; padding: 2rem; color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+      display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+    }
+    .spin { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ResearchAgent</div>
+  <div class="admin-badge">ADMIN PANEL</div>
+</header>
+
+<main>
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value purple" id="statTotal">—</div></div>
+    <div class="stat-card"><div class="stat-label">Google OAuth</div><div class="stat-value blue" id="statGoogle">—</div></div>
+    <div class="stat-card"><div class="stat-label">Email/Password</div><div class="stat-value green" id="statEmail">—</div></div>
+    <div class="stat-card"><div class="stat-label">Total Queries</div><div class="stat-value yellow" id="statQueries">—</div></div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by name or email…" oninput="filterUsers()"/>
+    <button class="filter-btn active" id="filterAll" onclick="setFilter('all')">ALL</button>
+    <button class="filter-btn" id="filterGoogle" onclick="setFilter('google')">GOOGLE</button>
+    <button class="filter-btn" id="filterEmail" onclick="setFilter('email')">EMAIL</button>
+  </div>
+
+  <div class="section-title">Registered Users <span id="countLabel" style="color:var(--muted);font-size:0.8rem;font-weight:400;"></span></div>
+
+  <div id="usersContainer">
+    <div class="loading"><div class="spin"></div> Loading users…</div>
+  </div>
+</main>
+
+<script>
+  let allUsers = [];
+  let activeFilter = 'all';
+
+  async function loadStats() {
+    try {
+      const r = await fetch('/api/admin/stats');
+      const d = await r.json();
+      document.getElementById('statTotal').textContent = d.total_users ?? '—';
+      document.getElementById('statGoogle').textContent = d.google_users ?? '—';
+      document.getElementById('statEmail').textContent = d.email_users ?? '—';
+      document.getElementById('statQueries').textContent = d.total_queries ?? '—';
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadUsers() {
+    try {
+      const r = await fetch('/api/admin/users');
+      allUsers = await r.json();
+      renderUsers();
+    } catch(e) {
+      document.getElementById('usersContainer').innerHTML = '<div class="empty-state">Failed to load users.</div>';
+    }
+  }
+
+  function setFilter(f) {
+    activeFilter = f;
+    ['all','google','email'].forEach(k => {
+      document.getElementById('filter'+k.charAt(0).toUpperCase()+k.slice(1)).classList.toggle('active', k===f);
+    });
+    renderUsers();
+  }
+
+  function filterUsers() { renderUsers(); }
+
+  function renderUsers() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    let list = allUsers;
+    if (activeFilter !== 'all') list = list.filter(u => u.provider === activeFilter);
+    if (query) list = list.filter(u => (u.name||'').toLowerCase().includes(query) || (u.email||'').toLowerCase().includes(query));
+
+    document.getElementById('countLabel').textContent = `(${list.length})`;
+    const container = document.getElementById('usersContainer');
+
+    if (!list.length) { container.innerHTML = '<div class="empty-state">No users found.</div>'; return; }
+
+    container.innerHTML = '<div class="users-grid">' + list.map((u, i) => {
+      const initials = (u.name || u.email || '?')[0].toUpperCase();
+      const avatarHtml = u.avatar
+        ? `<img src="${u.avatar}" alt=""/>`
+        : initials;
+      const date = u.created_at ? new Date(u.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}) : '';
+      const provClass = u.provider === 'google' ? 'provider-google' : 'provider-email';
+      const provLabel = u.provider === 'google' ? 'Google' : 'Email';
+      return `
+        <div class="user-card" style="animation-delay:${i*0.04}s">
+          <div class="u-avatar">${avatarHtml}</div>
+          <div class="u-info">
+            <div class="u-name">${u.name || '—'}</div>
+            <div class="u-email">${u.email}</div>
+            <div class="u-meta">
+              <span class="provider-badge ${provClass}">${provLabel}</span>
+              <span class="u-date">${date}</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('') + '</div>';
+  }
+
+  loadStats();
+  loadUsers();
+</script>
+</body>
+</html>

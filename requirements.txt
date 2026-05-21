@@ -1,0 +1,55 @@
+# =============================================================================
+# MULTI-AGENT RESEARCH SYSTEM — Requirements
+# Stack: LangChain 1.0 | MistralAI | Tavily | BeautifulSoup | LCEL Runnables
+# =============================================================================
+
+flask 
+supabase
+
+
+# ── Core LangChain ────────────────────────────────────────────────────────────
+langchain                        # Core framework — agents, tools, LCEL runnables
+langchain-core                   # Base abstractions — Runnables, Messages, Prompts
+langchain-community              # Community tools and integrations
+
+
+# ── LLM Provider ─────────────────────────────────────────────────────────────
+langchain-mistralai              # MistralAI chat model integration for LangChain
+mistralai                        # Official MistralAI Python SDK (if needed directly)
+
+
+# ── Agent Framework ───────────────────────────────────────────────────────────
+langgraph                        # Graph-based multi-agent runtime (used by create_agent)
+
+
+# ── Tools ─────────────────────────────────────────────────────────────────────
+tavily-python                    # Tavily search client for web research tool
+beautifulsoup4                   # HTML parsing for web scraping tool
+requests                         # HTTP client — used to fetch pages for BeautifulSoup
+lxml                             # Fast XML/HTML parser backend for BeautifulSoup
+
+
+# ── LCEL / Runnable Pipeline ──────────────────────────────────────────────────
+# Already included in langchain-core (RunnablePassthrough, RunnableLambda, etc.)
+# No extra install needed — just import from langchain_core.runnables
+
+
+# ── Environment & Config ──────────────────────────────────────────────────────
+python-dotenv                    # Load API keys from .env file
+
+
+# ── Output & Logging ──────────────────────────────────────────────────────────
+rich                             # Pretty terminal output with colors and formatting
+
+
+# ── Typing & Validation ───────────────────────────────────────────────────────
+pydantic                         # Data validation — used heavily by LangChain internals
+
+
+# ── Optional but Recommended ─────────────────────────────────────────────────
+# langsmith                      # Tracing and debugging for LangChain agents
+# httpx                          # Async HTTP client (if you later add async support)
+
+# ── Additional LLM Provider (Groq) ───────────────────────────────────────────
+langchain-groq                   # Groq chat model integration for LangChain
+groq                             # Official Groq Python SDK
