@@ -6,6 +6,7 @@
 flask 
 supabase
 gunicorn
+gevent
 
 # ── Core LangChain ────────────────────────────────────────────────────────────
 langchain                        # Core framework — agents, tools, LCEL runnables
